@@ -1,4 +1,4 @@
-package com.natman.balance;
+package com.natman.balance.gameplay;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;

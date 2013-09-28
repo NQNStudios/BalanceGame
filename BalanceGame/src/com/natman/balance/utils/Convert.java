@@ -1,4 +1,4 @@
-package com.natman.balance;
+package com.natman.balance.utils;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;

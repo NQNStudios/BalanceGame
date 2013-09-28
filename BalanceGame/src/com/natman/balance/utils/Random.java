@@ -1,4 +1,4 @@
-package com.natman.balance;
+package com.natman.balance.utils;
 
 /**
  * A wrapper of Java's Random class that provides extra functionality for making games.

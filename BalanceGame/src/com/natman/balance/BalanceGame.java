@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.natman.balance.screens.GameScreen;
+import com.natman.balance.utils.Convert;
 
 public class BalanceGame extends Game {
 	private SpriteBatch batch;
