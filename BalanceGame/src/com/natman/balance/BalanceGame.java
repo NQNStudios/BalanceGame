@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.natman.balance.screens.GameScreen;
 
 public class BalanceGame extends Game {
 	private SpriteBatch batch;
@@ -13,6 +14,8 @@ public class BalanceGame extends Game {
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
+		
+		setScreen(new GameScreen(this));
 	}
 
 	@Override
