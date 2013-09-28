@@ -4,3 +4,6 @@
 *.jar
 *.war
 *.ear
+
+/BalanceGame-html/gwt-unitCache/*
+/BalanceGame-html/war/*
