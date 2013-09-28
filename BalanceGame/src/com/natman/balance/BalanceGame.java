@@ -13,6 +13,8 @@ public class BalanceGame extends Game {
 	
 	@Override
 	public void create() {
+		Gdx.graphics.setDisplayMode(800, 480, false);
+		
 		batch = new SpriteBatch();
 		
 		setScreen(new GameScreen(this));
@@ -27,6 +29,8 @@ public class BalanceGame extends Game {
 	public void render() {		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		
+		super.render();
 	}
 
 	@Override
