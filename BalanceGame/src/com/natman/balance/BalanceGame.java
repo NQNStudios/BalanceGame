@@ -13,6 +13,8 @@ public class BalanceGame extends Game {
 	
 	@Override
 	public void create() {
+		Convert.init(16);
+		
 		Gdx.graphics.setDisplayMode(800, 480, false);
 		
 		batch = new SpriteBatch();

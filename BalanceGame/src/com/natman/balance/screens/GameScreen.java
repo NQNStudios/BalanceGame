@@ -14,11 +14,13 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.natman.balance.BalanceGame;
 import com.natman.balance.Convert;
 import com.natman.balance.PhysicsWorld;
+import com.natman.balance.Random;
 
 public class GameScreen implements Screen {
 
@@ -28,8 +30,31 @@ public class GameScreen implements Screen {
 	
 	private PhysicsWorld world;
 	private Box2DDebugRenderer worldRenderer;
+	private Matrix4 worldMatrix;
 	
 	private BitmapFont font;
+	
+	private Random r = new Random();
+	
+	//region Config
+	
+	private static final float floorX = 0;
+	private static final float floorY = Convert.pixelsToMeters(-240);
+	private static final float floorWidth = Convert.pixelsToMeters(800);
+	private static final float floorHeight = Convert.pixelsToMeters(5);
+	
+	private static final float playerWidth = 1;
+	private static final float playerHeight = 2.5f;
+	
+	private static final float pillarWidth = 0.5f;
+	private static final float minPillarHeight = 8f;
+	private static final float maxPillarHeight = 15f;
+	
+	private static final float platformHeight = 0.5f;
+	private static final float minPlatformWidth = 10f;
+	private static final float maxPlatformWidth = 20f;
+	
+	//endregion
 	
 	public GameScreen(BalanceGame game) {
 		this.game = game;
@@ -39,8 +64,6 @@ public class GameScreen implements Screen {
 		
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, w, h);
-		
-		Convert.init(16);
 		
 		world = new PhysicsWorld(new Vector2(0, -10));
 		worldRenderer = new Box2DDebugRenderer();
@@ -55,15 +78,17 @@ public class GameScreen implements Screen {
 	private void initializeWorld() {
 		createFloor();
 		createPlayer();
+		
+		createTower(2);
 	}
 
 	private void createFloor() {
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.StaticBody;
-		bd.position.set(Convert.pixelsToMeters(-400), Convert.pixelsToMeters(-220));
+		bd.position.set(floorX, floorY);
 		
 		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(Convert.pixelsToMeters(800), 1);
+		shape.setAsBox(floorWidth, floorHeight);
 		
 		FixtureDef fd = new FixtureDef();
 		fd.shape = shape;
@@ -77,10 +102,64 @@ public class GameScreen implements Screen {
 	private void createPlayer() {
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.DynamicBody;
-		bd.fixedRotation = true;
+		bd.fixedRotation = false;
+		bd.position.set(-10, 30);
+		bd.bullet = true;
 		
 		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(1, 3f);
+		shape.setAsBox(playerWidth, playerHeight);
+		
+		FixtureDef fd = new FixtureDef();
+		fd.shape = shape;
+		fd.density = 25;
+		
+		
+		Body body = world.getWorld().createBody(bd);
+		body.createFixture(fd);
+		
+		shape.dispose();
+	}
+	
+	private void createTower(float x) {
+		float height = r.nextFloat(minPillarHeight, maxPillarHeight);
+		
+		createPillar(x, height);
+		
+		createPlatform(x, height + height);
+	}
+	
+	private void createPlatform(float x, float y) {
+		
+		float width = r.nextFloat(minPlatformWidth, maxPlatformWidth);
+		
+		BodyDef bd = new BodyDef();
+		bd.type = BodyType.DynamicBody;
+		bd.position.set(x, floorY + floorHeight + y);
+		bd.fixedRotation = false;
+		
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(width, platformHeight);
+		
+		FixtureDef fd = new FixtureDef();
+		fd.shape = shape;
+		fd.friction = 0.5f;
+		fd.density = 25;
+		
+		Body body = world.getWorld().createBody(bd);
+		body.createFixture(fd);
+		
+		shape.dispose();
+		
+	}
+
+	private void createPillar(float x, float height) {
+		
+		BodyDef bd = new BodyDef();
+		bd.type = BodyType.StaticBody;
+		bd.position.set(x, floorY + floorHeight + height);
+		
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(pillarWidth, height);
 		
 		FixtureDef fd = new FixtureDef();
 		fd.shape = shape;
@@ -89,8 +168,9 @@ public class GameScreen implements Screen {
 		body.createFixture(fd);
 		
 		shape.dispose();
+		
 	}
-
+	
 	@Override
 	public void render(float delta) {
 		
@@ -116,13 +196,14 @@ public class GameScreen implements Screen {
 		//Draw the game objects here
 //		font.draw(batch, "Camera Pos: " + camera.position.x + ", " + camera.position.y, 0, 0);
 //		font.draw(batch, "Camera Pos: " + camera.position.x + ", " + camera.position.y, camera.position.x, camera.position.y);
+		font.draw(batch, "" + Gdx.graphics.getFramesPerSecond(), camera.position.x, camera.position.y);
 		
 		batch.end();
 		
-		Matrix4 debugMatrix = new Matrix4(camera.combined);
-		debugMatrix.scale(Convert.getPixelMeterRatio(), Convert.getPixelMeterRatio(), Convert.getPixelMeterRatio());
+		worldMatrix = new Matrix4(camera.combined);
+		worldMatrix.scale(Convert.getPixelMeterRatio(), Convert.getPixelMeterRatio(), Convert.getPixelMeterRatio());
 		
-		worldRenderer.render(world.getWorld(), debugMatrix);
+		worldRenderer.render(world.getWorld(), worldMatrix);
 		
 		world.process(delta);
 		

@@ -42,7 +42,6 @@ public final class PhysicsWorld implements Disposable {
 	 */
 	public PhysicsWorld(Vector2 gravity, int velocityIterations, int positionIterations) {
 		world = new World(gravity, true);
-		world.setAutoClearForces(false);
 		
 		this.velocityIterations = velocityIterations;
 		this.positionIterations = positionIterations;
