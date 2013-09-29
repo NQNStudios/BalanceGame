@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 
 /**
@@ -132,6 +134,22 @@ public class SpriteSheet implements Disposable {
 		}
 		
 		return regions;
+	}
+	
+	//endregion
+	
+	//region Sprite Making
+	
+	public Sprite makeSprite(String key) {
+		TextureRegion region = getRegion(key);
+		
+		Sprite sprite = new com.badlogic.gdx.graphics.g2d.Sprite(region);
+		
+		Vector2 origin = new Vector2(region.getRegionWidth() / 2, region.getRegionHeight() / 2);
+		
+		sprite.setOrigin(origin.x, origin.y);
+		
+		return sprite;
 	}
 	
 	//endregion

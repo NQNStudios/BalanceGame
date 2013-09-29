@@ -30,7 +30,7 @@ public class BalanceGame extends Game {
 
 	@Override
 	public void render() {		
-		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClearColor(0.2f, 0f, 0f, 1f);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		super.render();

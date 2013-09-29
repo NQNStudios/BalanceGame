@@ -1,12 +1,16 @@
 package com.natman.balance.gameplay;
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -15,8 +19,11 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.natman.balance.gameplay.entities.Pillar;
+import com.natman.balance.gameplay.entities.Player;
 import com.natman.balance.utils.Convert;
 import com.natman.balance.utils.Random;
+import com.natman.balance.utils.SpriteSheet;
 
 public class GameWorld {
 	
@@ -31,21 +38,21 @@ public class GameWorld {
 	private BitmapFont font;
 	private Random r = new Random();
 	
+	private SpriteSheet spriteSheet;
+	
+	private Player player;
+	
 	//endregion
 	
 	//region Config
 	
-	private static final float floorX = 0;
-	private static final float floorY = Convert.pixelsToMeters(-240);
-	private static final float floorWidth = Convert.pixelsToMeters(800);
-	private static final float floorHeight = Convert.pixelsToMeters(5);
+	public static final float floorX = 0;
+	public static final float floorY = Convert.pixelsToMeters(-480);
+	public static final float floorWidth = Convert.pixelsToMeters(800);
+	public static final float floorHeight = Convert.pixelsToMeters(5);
 	
-	private static final float playerWidth = 1f;
-	private static final float playerHeight = 2.5f;
-	
-	private static final float pillarWidth = 0.5f;
-	private static final float minPillarHeight = 8f;
-	private static final float maxPillarHeight = 15f;
+	private static final float minPillarHeight = 15f;
+	private static final float maxPillarHeight = 30f;
 	
 	private static final float platformHeight = 0.5f;
 	private static final float minPlatformWidth = 10f;
@@ -68,7 +75,9 @@ public class GameWorld {
 		font = new BitmapFont();
 		font.setColor(Color.WHITE);
 		
+		spriteSheet = new SpriteSheet(new Texture(Gdx.files.internal("data/sprites.png")));
 		
+		initializeSpriteSheet();
 		initializeWorld();
 	}
 	
@@ -76,11 +85,21 @@ public class GameWorld {
 	
 	//region Entities
 	
+	private void initializeSpriteSheet() {
+		spriteSheet.addRegion("Player", new Rectangle(0, 0, 16, 40));
+		spriteSheet.addRegion("Platform", new Rectangle(16, 0, 16, 40));
+	}
+
 	private void initializeWorld() {
 		createFloor();
-		createPlayer();
+
+		player = new Player(spriteSheet, world.getWorld());
 		
-		createTower(2);
+		new Pillar(spriteSheet, world.getWorld(), 2, r.nextFloat(minPillarHeight, maxPillarHeight));
+		
+		//createTower(2);
+		//createTower(-10);
+		//createTower(10);
 	}
 
 	private void createFloor() {
@@ -90,24 +109,6 @@ public class GameWorld {
 		
 		PolygonShape shape = new PolygonShape();
 		shape.setAsBox(floorWidth / 2, floorHeight / 2);
-		
-		FixtureDef fd = new FixtureDef();
-		fd.shape = shape;
-		
-		Body body = world.getWorld().createBody(bd);
-		body.createFixture(fd);
-		
-		shape.dispose();
-	}
-	
-	private void createPlayer() {
-		BodyDef bd = new BodyDef();
-		bd.type = BodyType.DynamicBody;
-		bd.fixedRotation = false;
-		bd.position.set(-10, 30);
-		
-		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(playerWidth / 2, playerHeight / 2);
 		
 		FixtureDef fd = new FixtureDef();
 		fd.shape = shape;
@@ -152,21 +153,6 @@ public class GameWorld {
 
 	private void createPillar(float x, float height) {
 		
-		BodyDef bd = new BodyDef();
-		bd.type = BodyType.StaticBody;
-		bd.position.set(x, floorY + floorHeight + height / 2);
-		
-		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(pillarWidth / 2, height / 2);
-		
-		FixtureDef fd = new FixtureDef();
-		fd.shape = shape;
-		
-		Body body = world.getWorld().createBody(bd);
-		body.createFixture(fd);
-		
-		shape.dispose();
-		
 	}
 	
 	//endregion
@@ -192,7 +178,15 @@ public class GameWorld {
 		
 		batch.begin();
 		
-		font.draw(batch, "" + Gdx.graphics.getFramesPerSecond(), camera.position.x, camera.position.y);
+		//font.draw(batch, "" + Gdx.graphics.getFramesPerSecond(), camera.position.x, camera.position.y); //Performance info
+		Iterator<Body> it = world.getWorld().getBodies();
+		while (it.hasNext()) {
+			Body body = it.next();
+			
+			Entity e = (Entity) body.getUserData();
+			
+			if (e != null) e.draw(batch);
+		}
 		
 		batch.end();
 		
