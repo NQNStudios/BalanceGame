@@ -41,9 +41,14 @@ public class GameWorld {
 	
 	private SpriteSheet spriteSheet;
 	
+	private Body floor;
 	private Player player;
 	
 	private boolean debugRender = true;
+	
+	private float furthestX = 0;
+	private float lastWidth = maxPlatformWidth;
+	private float lastHeight = firstPillarHeight;
 	
 	//endregion
 	
@@ -54,11 +59,15 @@ public class GameWorld {
 	public static final float floorWidth = 8000;
 	public static final float floorHeight = Convert.pixelsToMeters(5);
 	
+	private static final float firstPillarHeight = 27f;
 	private static final float minPillarHeight = 15f;
 	private static final float maxPillarHeight = 30f;
+	private static final float upMax = 2.75f;
 	
 	private static final float minPlatformWidth = 10f;
 	private static final float maxPlatformWidth = 20f;
+	
+	private static final float removalDistance = Convert.pixelsToMeters(650);
 	
 	//endregion
 	
@@ -100,7 +109,7 @@ public class GameWorld {
 		
 		createStartingTower();
 		
-		for (int i = 17; i < 500; i += 8) {
+		for (int i = 17; i < 100; i += lastWidth) {
 			createTower(i);
 		}
 	}
@@ -119,26 +128,31 @@ public class GameWorld {
 		Body body = world.getWorld().createBody(bd);
 		body.createFixture(fd);
 		
+		floor = body;
+		
 		shape.dispose();
 	}
 	
 	private void createStartingTower() {
-		float height = 27f;
+		float height = firstPillarHeight;
 		
 		createPillar(0, height);
 		createPlatform(0, height, maxPlatformWidth);
 	}
 	
 	private void createTower(float x) {
-		float height = r.nextFloat(minPillarHeight, maxPillarHeight);
+		float height = r.nextFloat(minPillarHeight, Math.min(maxPillarHeight, lastHeight + upMax));
 		
 		createPillar(x, height);
 		
 		createPlatform(x, height, r.nextFloat(minPlatformWidth, maxPlatformWidth));
+		
+		lastHeight = height;
 	}
 	
 	private void createPlatform(float x, float y, float width) {
 		new Platform(spriteSheet, world.getWorld(), x, y, width);
+		lastWidth = width;
 	}
 
 	private void createPillar(float x, float height) {
@@ -153,6 +167,12 @@ public class GameWorld {
 		camera.position.set(Convert.metersToPixels(new Vector3(player.body.getPosition().x, 0, 0)));
 		
 		camera.update();
+		
+		removeOffscreenEntities();
+		
+		if (player.body.getPosition().x > furthestX) {
+			furthestX = player.body.getPosition().x;
+		}
 		
 		batch.setProjectionMatrix(camera.combined);
 		
@@ -193,9 +213,29 @@ public class GameWorld {
 			player.jump();
 		}
 		
+		floor.getPosition().set(new Vector2(player.body.getPosition().x, floorY));
+		
 		world.process(delta);
 	}
-	
+
+	private void removeOffscreenEntities() {		
+		Vector2 cameraPos = Convert.pixelsToMeters(new Vector2(camera.position.x, camera.position.y));
+		
+		Iterator<Body> it = world.getWorld().getBodies();
+		while (it.hasNext()) {
+			Body body = it.next();
+			
+			if (body == null || body.getUserData() == null) continue;
+			
+			if (body.getPosition().dst(cameraPos) > removalDistance) {
+				Entity e = (Entity) body.getUserData();
+				
+				delete(e);
+			}
+			
+		}
+	}
+
 	public void resize(int width, int height) {
 		camera.setToOrtho(false, width, height);
 		camera.position.set(0, 0, 0);
@@ -203,6 +243,11 @@ public class GameWorld {
 	
 	public void dispose() {
 		world.dispose();
+	}
+	
+	public void delete(Entity e) {
+		Body body = e.body;
+		world.getWorld().destroyBody(body);
 	}
 	
 	//endregion

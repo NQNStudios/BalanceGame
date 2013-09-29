@@ -20,7 +20,7 @@ public class Player extends Entity {
 	private static final float density = 12f;
 	
 	private static final float moveSpeed = 50f;
-	private static final float jumpSpeed = 750f;
+	private static final float jumpSpeed = 1450f;
 	
 	//endregion
 	
@@ -84,6 +84,7 @@ public class Player extends Entity {
 
 	public void jump() {
 		body.applyForceToCenter(new Vector2(0, jumpSpeed * density), true);
+		canJump = false;
 	}
 	
 }
