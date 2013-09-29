@@ -20,6 +20,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.natman.balance.gameplay.entities.Pillar;
+import com.natman.balance.gameplay.entities.Platform;
 import com.natman.balance.gameplay.entities.Player;
 import com.natman.balance.utils.Convert;
 import com.natman.balance.utils.Random;
@@ -42,6 +43,8 @@ public class GameWorld {
 	
 	private Player player;
 	
+	private boolean debugRender = true;
+	
 	//endregion
 	
 	//region Config
@@ -54,7 +57,6 @@ public class GameWorld {
 	private static final float minPillarHeight = 15f;
 	private static final float maxPillarHeight = 30f;
 	
-	private static final float platformHeight = 0.5f;
 	private static final float minPlatformWidth = 10f;
 	private static final float maxPlatformWidth = 20f;
 	
@@ -95,11 +97,7 @@ public class GameWorld {
 
 		player = new Player(spriteSheet, world.getWorld());
 		
-		new Pillar(spriteSheet, world.getWorld(), 2, r.nextFloat(minPillarHeight, maxPillarHeight));
-		
-		//createTower(2);
-		//createTower(-10);
-		//createTower(10);
+		createTower(2);
 	}
 
 	private void createFloor() {
@@ -124,35 +122,15 @@ public class GameWorld {
 		
 		createPillar(x, height);
 		
-		createPlatform(x, height);
+		createPlatform(x, height, r.nextFloat(minPlatformWidth, maxPlatformWidth));
 	}
 	
-	private void createPlatform(float x, float y) {
-		
-		float width = r.nextFloat(minPlatformWidth, maxPlatformWidth);
-		
-		BodyDef bd = new BodyDef();
-		bd.type = BodyType.DynamicBody;
-		bd.position.set(x, floorY + floorHeight + y);
-		bd.fixedRotation = false;
-		
-		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(width / 2, platformHeight / 2);
-		
-		FixtureDef fd = new FixtureDef();
-		fd.shape = shape;
-		fd.friction = 0.5f;
-		fd.density = 25;
-		
-		Body body = world.getWorld().createBody(bd);
-		body.createFixture(fd);
-		
-		shape.dispose();
-		
+	private void createPlatform(float x, float y, float width) {
+		new Platform(spriteSheet, world.getWorld(), x, y, width);
 	}
 
 	private void createPillar(float x, float height) {
-		
+		new Pillar(spriteSheet, world.getWorld(), x, height);
 	}
 	
 	//endregion
@@ -190,10 +168,16 @@ public class GameWorld {
 		
 		batch.end();
 		
-		worldMatrix = new Matrix4(camera.combined);
-		worldMatrix.scale(Convert.getPixelMeterRatio(), Convert.getPixelMeterRatio(), Convert.getPixelMeterRatio());
+		if (Gdx.input.isKeyPressed(Keys.F1)) {
+			debugRender = !debugRender;
+		}
 		
-		worldRenderer.render(world.getWorld(), worldMatrix);
+		if (debugRender) {
+			worldMatrix = new Matrix4(camera.combined);
+			worldMatrix.scale(Convert.getPixelMeterRatio(), Convert.getPixelMeterRatio(), Convert.getPixelMeterRatio());
+			
+			worldRenderer.render(world.getWorld(), worldMatrix);
+		}
 		
 		world.process(delta);
 	}

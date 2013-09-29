@@ -9,15 +9,15 @@ import com.natman.balance.gameplay.Entity;
 import com.natman.balance.gameplay.GameWorld;
 import com.natman.balance.utils.SpriteSheet;
 
-public class Pillar extends Entity {
+public class Platform extends Entity {
 
 	//region Config
 	
-	private static final float pillarWidth = 0.5f;
+	private static final float platformHeight = 0.5f;
 	
 	//endregion
 	
-	public Pillar(SpriteSheet sheet, World world, Object... args) {
+	public Platform(SpriteSheet sheet, World world, Object... args) {
 		super(sheet, world, args);
 	}
 
@@ -25,17 +25,18 @@ public class Pillar extends Entity {
 	protected void initializeBody(World world, Object... args) {
 		
 		float x = (Float) args[0];
-		float height = (Float) args[1];
+		float y = (Float) args[1];
+		float width = (Float) args[2];
 		
-		setWidth(pillarWidth);
-		setHeight(height);
+		setWidth(width);
+		setHeight(platformHeight);
 		
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.StaticBody;
-		bd.position.set(x, GameWorld.floorY + GameWorld.floorHeight + height / 2);
+		bd.position.set(x, GameWorld.floorY + GameWorld.floorHeight + y + platformHeight / 2);
 		
 		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(pillarWidth / 2, height / 2);
+		shape.setAsBox(width / 2, platformHeight / 2);
 		
 		FixtureDef fd = new FixtureDef();
 		fd.shape = shape;
