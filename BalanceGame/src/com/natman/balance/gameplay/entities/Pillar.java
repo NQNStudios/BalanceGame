@@ -39,8 +39,7 @@ public class Pillar extends Entity {
 		
 		FixtureDef fd = new FixtureDef();
 		fd.shape = shape;
-		fd.density = 25;
-		fd.friction = 1;
+		//fd.density = 25;
 		
 		body = world.createBody(bd);
 		body.createFixture(fd);

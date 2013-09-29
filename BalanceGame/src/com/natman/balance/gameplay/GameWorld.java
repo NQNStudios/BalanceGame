@@ -182,15 +182,15 @@ public class GameWorld {
 		}
 		
 		if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-			player.body.applyForceToCenter(new Vector2(1000, 0), true);
+			player.moveRight();
 		}
 		
 		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-			player.body.applyForceToCenter(new Vector2(-1000, 0), true);
+			player.moveLeft();
 		}
 		
 		if (Gdx.input.isKeyPressed(Keys.SPACE) && player.canJump) {
-			player.body.applyForceToCenter(new Vector2(0, 32000), true);
+			player.jump();
 		}
 		
 		world.process(delta);

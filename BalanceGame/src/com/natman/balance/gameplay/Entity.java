@@ -20,6 +20,8 @@ public abstract class Entity {
 		initializeBody(world, args);
 		
 		body.setUserData(this);
+		
+		sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
 	}
 	
 	protected abstract void initializeBody(World world, Object... args);
@@ -31,11 +33,14 @@ public abstract class Entity {
 		
 		sprite.setPosition(x, y);
 		
-		sprite.setRotation((float) Math.toDegrees(body.getAngle()));
-		
 		if (width > 0 && height > 0) {
 			sprite.setBounds(x, y, Convert.metersToPixels(width), Convert.metersToPixels(height));
+			sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
 		}
+		
+		sprite.setRotation((float) Math.toDegrees(body.getAngle()));
+		
+		
 		
 		sprite.draw(batch);
 	}

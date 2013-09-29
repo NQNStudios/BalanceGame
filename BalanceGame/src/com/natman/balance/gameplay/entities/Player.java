@@ -17,6 +17,11 @@ public class Player extends Entity {
 	private static final float playerWidth = 1f;
 	private static final float playerHeight = 2.5f;
 	
+	private static final float density = 12f;
+	
+	private static final float moveSpeed = 50f;
+	private static final float jumpSpeed = 750f;
+	
 	//endregion
 	
 	public boolean canJump = false;
@@ -42,7 +47,7 @@ public class Player extends Entity {
 		
 		FixtureDef fd = new FixtureDef();
 		fd.shape = shape;
-		fd.density = 25;
+		fd.density = density;
 		fd.friction = 0.3f;
 		
 		float sensorHX = Convert.pixelsToMeters(6);
@@ -68,5 +73,17 @@ public class Player extends Entity {
 		shape.dispose();
 		sensorShape.dispose();
 	}
+	
+	public void moveLeft() {
+		body.applyForceToCenter(new Vector2(-moveSpeed * density, 0), true);
+	}
+	
+	public void moveRight() {
+		body.applyForceToCenter(new Vector2(moveSpeed * density, 0), true);
+	}
 
+	public void jump() {
+		body.applyForceToCenter(new Vector2(0, jumpSpeed * density), true);
+	}
+	
 }

@@ -32,7 +32,7 @@ public class Platform extends Entity {
 		setHeight(platformHeight);
 		
 		BodyDef bd = new BodyDef();
-		bd.type = BodyType.StaticBody;
+		bd.type = BodyType.DynamicBody;
 		bd.position.set(x, GameWorld.floorY + GameWorld.floorHeight + y + platformHeight / 2);
 		
 		PolygonShape shape = new PolygonShape();
@@ -40,8 +40,8 @@ public class Platform extends Entity {
 		
 		FixtureDef fd = new FixtureDef();
 		fd.shape = shape;
+		fd.density = 25f;
 		fd.friction = 0.3f;
-		fd.density = 25;
 		
 		body = world.createBody(bd);
 		body.createFixture(fd);
