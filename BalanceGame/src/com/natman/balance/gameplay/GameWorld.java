@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -54,7 +55,8 @@ public class GameWorld {
 	private float lastHeight = firstPillarHeight;
 	
 	private float boulderChance = 0.005f;
-	private static final float boulderSpawnRadius = Convert.pixelsToMeters(380);
+	
+	private float highScore = 0;
 	
 	//endregion
 	
@@ -74,9 +76,13 @@ public class GameWorld {
 	private static final float maxPlatformWidth = 20f;
 	
 	private static final float maxDistance = 6f;
-	private static final float creationDistance = 20f;
+	private static final float creationDistance = maxPlatformWidth * 2;
 	
 	private static final float removalDistance = Convert.pixelsToMeters(500);
+	
+	private static final float boulderSpawnRadius = Convert.pixelsToMeters(380);
+	
+	private static final float playerDeathZone = Convert.pixelsToMeters(-280);
 	
 	//endregion
 	
@@ -100,6 +106,9 @@ public class GameWorld {
 		
 		initializeSpriteSheet();
 		initializeWorld();
+		
+		Preferences prefs = Gdx.app.getPreferences("CrashingDownData");
+		highScore = prefs.getFloat("HighScore", 0f);
 	}
 	
 	//endregion
@@ -188,6 +197,8 @@ public class GameWorld {
 		if (player.body.getPosition().x > furthestX) {
 			furthestX = player.body.getPosition().x;
 			
+			boulderChance += 0.00001f;
+			
 			if (furthestX >= lastX - creationDistance) {
 				createTower(lastX + r.nextFloat(lastWidth, lastWidth + maxDistance));
 			}
@@ -202,7 +213,15 @@ public class GameWorld {
 		
 		batch.begin();
 		
-		//font.draw(batch, "" + Gdx.graphics.getFramesPerSecond(), camera.position.x, camera.position.y); //Performance info
+
+		if (debugRender) font.draw(batch, "" + Gdx.graphics.getFramesPerSecond(), camera.position.x, camera.position.y); //Performance info
+		
+		if (furthestX > highScore) highScore = furthestX;
+		
+		float x = camera.position.x - camera.viewportWidth / 2;
+		float y = camera.position.y + camera.viewportHeight / 2;
+		font.draw(batch, "m traveled: " + (int) furthestX + "   furthest traveled: " + (int) highScore, x, y);
+		
 		Iterator<Body> it = world.getWorld().getBodies();
 		while (it.hasNext()) {
 			Body body = it.next();
@@ -261,6 +280,16 @@ public class GameWorld {
 				continue;
 			}
 			
+			if (body.getUserData() instanceof Player) {
+				if (body.getPosition().y < playerDeathZone) {
+					Entity e = (Entity) body.getUserData();
+					
+					delete(e);
+				}
+				
+				continue;
+			}
+			
 			if (body.getPosition().dst(cameraPos) > removalDistance) {
 				Entity e = (Entity) body.getUserData();
 				
@@ -277,11 +306,19 @@ public class GameWorld {
 	
 	public void dispose() {
 		world.dispose();
+		
+		Preferences prefs = Gdx.app.getPreferences("CrashingDownData");
+		
+		prefs.putFloat("HighScore", highScore);
+		
+		prefs.flush();
 	}
 	
 	public void delete(Entity e) {
 		Body body = e.body;
 		world.getWorld().destroyBody(body);
+		
+		e = null;
 	}
 	
 	//endregion
