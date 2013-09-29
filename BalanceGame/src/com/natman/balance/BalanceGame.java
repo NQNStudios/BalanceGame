@@ -2,10 +2,10 @@ package com.natman.balance;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.natman.balance.screens.GameScreen;
 import com.natman.balance.screens.MenuScreen;
 import com.natman.balance.utils.Convert;
 
@@ -54,6 +54,7 @@ public class BalanceGame extends Game {
 	public void setScreen(Screen screen) {
 		Screen oldScreen = getScreen();
 		super.setScreen(screen);
+		Gdx.input.setInputProcessor((InputProcessor) screen);
 		if (oldScreen != null) oldScreen.dispose();
 	}
 	

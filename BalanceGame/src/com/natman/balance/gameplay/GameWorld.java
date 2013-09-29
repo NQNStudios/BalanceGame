@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -29,7 +30,7 @@ import com.natman.balance.utils.Convert;
 import com.natman.balance.utils.Random;
 import com.natman.balance.utils.SpriteSheet;
 
-public class GameWorld {
+public class GameWorld implements InputProcessor {
 	
 	//region Fields
 	
@@ -49,7 +50,7 @@ public class GameWorld {
 	
 	private boolean debugRender = true;
 	
-	private float furthestX = 0;
+	public float furthestX = 0;
 	
 	private float lastX = 0;
 	private float lastWidth = maxPlatformWidth;
@@ -57,9 +58,15 @@ public class GameWorld {
 	
 	private float boulderChance = 0.005f;
 	
-	private float highScore = 0;
+	public float highScore = 0;
+	
+	public int jumps = 0;
+	public int bonks = 0;
 	
 	public boolean gameOver = false;
+	
+	private boolean movingLeft; 
+	private boolean movingRight;
 	
 	//endregion
 	
@@ -99,7 +106,7 @@ public class GameWorld {
 		camera.setToOrtho(false, w, h);
 		
 		world = new PhysicsWorld(new Vector2(0, -10));
-		world.getWorld().setContactListener(new ContactManager());
+		world.getWorld().setContactListener(new ContactManager(this));
 		worldRenderer = new Box2DDebugRenderer();
 		
 		font = new BitmapFont();
@@ -271,19 +278,15 @@ public class GameWorld {
 			worldRenderer.render(world.getWorld(), worldMatrix);
 		}
 		
-		if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-			player.moveRight();
-		}
+		floor.getPosition().set(new Vector2(player.body.getPosition().x, floorY));
 		
-		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
+		if (movingLeft) {
 			player.moveLeft();
 		}
 		
-		if (Gdx.input.isKeyPressed(Keys.SPACE) && player.canJump) {
-			player.jump();
+		if (movingRight) {
+			player.moveRight();
 		}
-		
-		floor.getPosition().set(new Vector2(player.body.getPosition().x, floorY));
 		
 		world.process(delta);
 	}
@@ -348,6 +351,69 @@ public class GameWorld {
 		world.getWorld().destroyBody(body);
 		
 		e = null;
+	}
+
+	@Override
+	public boolean keyDown(int keycode) {
+		if (keycode == Keys.LEFT) {
+			movingLeft = true;
+		} else if (keycode == Keys.RIGHT) {
+			movingRight = true;
+		}
+		
+		if (keycode == Keys.SPACE && player.canJump) {
+			player.jump();
+			jumps++;
+		}
+		
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		if (keycode == Keys.LEFT) {
+			movingLeft = false;
+		} else if (keycode == Keys.RIGHT) {
+			movingRight = false;
+		}
+		
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	//endregion

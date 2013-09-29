@@ -2,6 +2,7 @@ package com.natman.balance.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -10,7 +11,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.natman.balance.BalanceGame;
 
-public class MenuScreen implements Screen {
+public class MenuScreen implements Screen, InputProcessor {
 
 	private BalanceGame game;
 	private float highScore = 0f;
@@ -36,7 +37,7 @@ public class MenuScreen implements Screen {
 	public void render(float delta) {
 		batch.begin();
 		
-		font.draw(batch, "furthest traveled: " + highScore, 0, Gdx.graphics.getHeight());
+		font.draw(batch, "furthest traveled: " + (int) highScore, 0, Gdx.graphics.getHeight());
 		
 		TextBounds bounds = font.getBounds("CRASHING DOWN");
 		
@@ -57,12 +58,6 @@ public class MenuScreen implements Screen {
 		font.draw(batch, "Play Game: SPACE", x, y);
 		
 		batch.end();
-		
-		if (Gdx.input.isKeyPressed(Keys.SPACE)) {
-			game.setScreen(new GameScreen(game));
-		} else if (Gdx.input.isKeyPressed(Keys.I)) {
-			game.setScreen(new InfoScreen(game));
-		}
 	}
 
 	@Override
@@ -92,6 +87,59 @@ public class MenuScreen implements Screen {
 	@Override
 	public void dispose() {
 		
+	}
+
+	@Override
+	public boolean keyDown(int keycode) {
+		if (keycode == Keys.SPACE) {
+			game.setScreen(new GameScreen(game));
+		} else if (keycode == Keys.I) {
+			game.setScreen(new InfoScreen(game));
+		}
+		
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
