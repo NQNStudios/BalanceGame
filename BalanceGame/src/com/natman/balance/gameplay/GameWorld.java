@@ -58,6 +58,8 @@ public class GameWorld {
 	
 	private float highScore = 0;
 	
+	public boolean gameOver = false;
+	
 	//endregion
 	
 	//region Config
@@ -285,6 +287,8 @@ public class GameWorld {
 					Entity e = (Entity) body.getUserData();
 					
 					delete(e);
+					
+					gameOver = true;
 				}
 				
 				continue;

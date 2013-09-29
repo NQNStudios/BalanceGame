@@ -2,59 +2,55 @@ package com.natman.balance.screens;
 
 import com.badlogic.gdx.Screen;
 import com.natman.balance.BalanceGame;
-import com.natman.balance.gameplay.GameWorld;
 
-public class GameScreen implements Screen {
+public class InfoScreen implements Screen {
 
 	private BalanceGame game;
 	
-	private GameWorld world;
-	
-	public GameScreen(BalanceGame game) {
+	public InfoScreen(BalanceGame game) {
 		this.game = game;
-		
-		world = new GameWorld();
 	}
 	
 	@Override
 	public void render(float delta) {
-		world.render(delta, game.getSpriteBatch());
-		
-		if (world.gameOver) {
-			game.setScreen(new GameOverScreen(game));
-		}
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		world.resize(width, height);
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void show() {
-		
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void hide() {
-		
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void pause() {
-		
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void resume() {
-		
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void dispose() {
-		world.dispose();
+		// TODO Auto-generated method stub
+
 	}
-	
-	
 
 }

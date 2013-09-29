@@ -2,9 +2,11 @@ package com.natman.balance;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.natman.balance.screens.GameScreen;
+import com.natman.balance.screens.MenuScreen;
 import com.natman.balance.utils.Convert;
 
 public class BalanceGame extends Game {
@@ -20,7 +22,7 @@ public class BalanceGame extends Game {
 		
 		batch = new SpriteBatch();
 		
-		setScreen(new GameScreen(this));
+		setScreen(new MenuScreen(this));
 	}
 
 	@Override
@@ -47,4 +49,14 @@ public class BalanceGame extends Game {
 	@Override
 	public void resume() {
 	}
+
+	@Override
+	public void setScreen(Screen screen) {
+		Screen oldScreen = getScreen();
+		super.setScreen(screen);
+		if (oldScreen != null) oldScreen.dispose();
+	}
+	
+	
+	
 }
