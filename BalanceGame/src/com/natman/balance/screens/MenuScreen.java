@@ -43,10 +43,17 @@ public class MenuScreen implements Screen, InputProcessor {
 		
 		font.draw(batch, "CRASHING DOWN", Gdx.graphics.getWidth() / 2 - bounds.width / 2, 2 * Gdx.graphics.getHeight() / 3 + bounds.height / 2);
 		
-		bounds = font.getBounds("Instructions: I");
+		bounds = font.getBounds("Credits: C");
 		
 		float x = Gdx.graphics.getWidth() / 2 - bounds.width / 2;
 		float y = Gdx.graphics.getHeight() / 2 + bounds.height / 2;
+		
+		font.draw(batch, "Credits: C", x, y);
+		
+		bounds = font.getBounds("Instructions: I");
+		
+		x = Gdx.graphics.getWidth() / 2 - bounds.width / 2;
+		y += font.getLineHeight();
 		
 		font.draw(batch, "Instructions: I", x, y);
 		
@@ -95,6 +102,8 @@ public class MenuScreen implements Screen, InputProcessor {
 			game.setScreen(new GameScreen(game));
 		} else if (keycode == Keys.I) {
 			game.setScreen(new InfoScreen(game));
+		} else if (keycode == Keys.C) {
+			game.setScreen(new CreditsScreen(game));
 		}
 		
 		return false;

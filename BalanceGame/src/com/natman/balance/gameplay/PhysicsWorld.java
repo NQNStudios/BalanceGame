@@ -118,6 +118,8 @@ public final class PhysicsWorld implements Disposable {
 			singleStep();
 		}
 		
+		world.step(TIME_STEP * elapsedRatio, velocityIterations, positionIterations);
+		
 		world.clearForces();
 		
 	}

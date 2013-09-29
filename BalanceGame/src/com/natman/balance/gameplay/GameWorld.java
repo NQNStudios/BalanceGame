@@ -26,8 +26,10 @@ import com.natman.balance.gameplay.entities.Boulder;
 import com.natman.balance.gameplay.entities.Pillar;
 import com.natman.balance.gameplay.entities.Platform;
 import com.natman.balance.gameplay.entities.Player;
+import com.natman.balance.gameplay.entities.PowerUp;
 import com.natman.balance.utils.Convert;
 import com.natman.balance.utils.Random;
+import com.natman.balance.utils.SoundManager;
 import com.natman.balance.utils.SpriteSheet;
 
 public class GameWorld implements InputProcessor {
@@ -48,7 +50,7 @@ public class GameWorld implements InputProcessor {
 	private Body floor;
 	private Player player;
 	
-	private boolean debugRender = true;
+	private boolean debugRender = false;
 	
 	public float furthestX = 0;
 	
@@ -92,9 +94,17 @@ public class GameWorld implements InputProcessor {
 	
 	private static final float boulderSpawnRadius = Convert.pixelsToMeters(380);
 	
+	private static final float powerupDistance = Convert.pixelsToMeters(400);
+	private static final float powerupChance = 0.001f;
+	private static final float powerupY = Convert.pixelsToMeters(180);
+	
 	private static final float playerDeathZone = Convert.pixelsToMeters(-280);
 	
 	//endregion
+	
+	public OrthographicCamera getCamera() {
+		return camera;
+	}
 	
 	//region Constructor
 	
@@ -119,6 +129,8 @@ public class GameWorld implements InputProcessor {
 		
 		Preferences prefs = Gdx.app.getPreferences("CrashingDownData");
 		highScore = prefs.getFloat("HighScore", 0f);
+		
+		SoundManager.playSong("Music", 0.6f, true);
 	}
 	
 	//endregion
@@ -128,7 +140,9 @@ public class GameWorld implements InputProcessor {
 	private void initializeSpriteSheet() {
 		spriteSheet.addRegion("Player", new Rectangle(0, 0, 16, 40));
 		spriteSheet.addRegion("Platform", new Rectangle(16, 0, 16, 40));
-		spriteSheet.addRegion("Rock", new Rectangle(32, 0, 24, 24));
+		spriteSheet.addRegion("Rock", new Rectangle(32, 0, 23, 24));
+		spriteSheet.addRegion("SpeedPowerup", new Rectangle(55, 0, 19, 19));
+		spriteSheet.addRegion("JumpPowerup", new Rectangle(74, 0, 19, 19));
 	}
 
 	private void initializeWorld() {
@@ -142,7 +156,7 @@ public class GameWorld implements InputProcessor {
 			createTower(i);
 		}
 	}
-
+	
 	private void createFloor() {
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.StaticBody;
@@ -236,6 +250,10 @@ public class GameWorld implements InputProcessor {
 			if (furthestX >= lastX - creationDistance) {
 				createTower(lastX + r.nextFloat(lastWidth, lastWidth + maxDistance));
 			}
+			
+			for (int i = 0; i < r.floatToInt(powerupChance); i++) {
+				new PowerUp(spriteSheet, world.getWorld(), furthestX + powerupDistance, powerupY);
+			}
 		}
 		
 		for (int i = 0; i < r.floatToInt(boulderChance); i++) {
@@ -266,6 +284,8 @@ public class GameWorld implements InputProcessor {
 		}
 		
 		batch.end();
+		
+		player.processPowerups(delta);
 		
 		if (Gdx.input.isKeyPressed(Keys.F1)) {
 			debugRender = !debugRender;
@@ -364,6 +384,7 @@ public class GameWorld implements InputProcessor {
 		if (keycode == Keys.SPACE && player.canJump) {
 			player.jump();
 			jumps++;
+			SoundManager.playSound("Jump");
 		}
 		
 		return false;

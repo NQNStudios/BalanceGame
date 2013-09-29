@@ -8,6 +8,8 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Array;
 import com.natman.balance.gameplay.entities.Boulder;
 import com.natman.balance.gameplay.entities.Player;
+import com.natman.balance.gameplay.entities.PowerUp;
+import com.natman.balance.utils.SoundManager;
 
 public class ContactManager implements ContactListener {
 
@@ -31,10 +33,26 @@ public class ContactManager implements ContactListener {
 			sensor = fixtureB;
 		}
 		
-		if (sensor != null) {
+		if (sensor != null && sensor.getBody().getUserData() instanceof Player) {
 			//it's the player's sensor
 			Player player = (Player) sensor.getBody().getUserData();
 			player.canJump = true;
+		} else {
+			//it's a powerup
+			Entity other = null;
+			Entity powerup = null;
+			if (fixtureA.isSensor()) {
+				other = (Entity) fixtureB.getBody().getUserData();
+				powerup = (Entity) fixtureA.getBody().getUserData();
+			} else if (fixtureB.isSensor()) {
+				other = (Entity) fixtureA.getBody().getUserData();
+				powerup = (Entity) fixtureB.getBody().getUserData();
+			}		
+			
+			if (other instanceof Player) {
+				((Player) other).givePowerup(((PowerUp) powerup).jump);
+				world.delete(powerup);
+			}
 		}
 		
 		Entity e1 = (Entity) fixtureA.getBody().getUserData();
@@ -42,6 +60,15 @@ public class ContactManager implements ContactListener {
 		
 		if (e1 == null || e2 == null) return;
 		
+		if (e1 instanceof Boulder || e2 instanceof Boulder) {
+			//play boulder crash sound
+			SoundManager.playSound("Boulder");
+		}
+		
+		if (e1 instanceof Player || e2 instanceof Player) {
+			SoundManager.playSound("Player");
+		}
+			
 		//check various collision types
 		if (e1 instanceof Player && e2 instanceof Boulder || e2 instanceof Player && e1 instanceof Boulder) {
 			//It's a player-boulder collision
@@ -69,7 +96,7 @@ public class ContactManager implements ContactListener {
 			sensor = fixtureB;
 		}
 		
-		if (sensor != null) {
+		if (sensor != null && sensor.getBody().getUserData() instanceof Player) {
 			//it's the player's sensor
 			Player player = (Player) sensor.getBody().getUserData();
 			player.canJump = false;

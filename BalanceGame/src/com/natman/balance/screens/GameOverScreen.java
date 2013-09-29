@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.natman.balance.BalanceGame;
+import com.natman.balance.utils.SoundManager;
 
 public class GameOverScreen implements Screen, InputProcessor {
 
@@ -96,8 +97,7 @@ public class GameOverScreen implements Screen, InputProcessor {
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
-
+		SoundManager.playSong("GameOver", 1f, false);
 	}
 
 	@Override
@@ -120,8 +120,7 @@ public class GameOverScreen implements Screen, InputProcessor {
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-
+		SoundManager.stopMusic();
 	}
 
 	@Override

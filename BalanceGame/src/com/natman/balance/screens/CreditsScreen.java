@@ -1,7 +1,7 @@
 package com.natman.balance.screens;
 
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -10,18 +10,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.natman.balance.BalanceGame;
 
-public class InfoScreen implements Screen, InputProcessor {
+public class CreditsScreen implements Screen, InputProcessor {
 
 	private BalanceGame game;
 	
 	private SpriteBatch batch;
 	private BitmapFont font;
 	
-	public InfoScreen(BalanceGame game) {
+	public CreditsScreen(BalanceGame game) {
 		this.game = game;
 		
 		batch = game.getSpriteBatch();
-		batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
 		font = new BitmapFont();
 		font.setColor(Color.WHITE);
@@ -29,11 +28,11 @@ public class InfoScreen implements Screen, InputProcessor {
 	
 	@Override
 	public void render(float delta) {
-		String title = "HOW TO PLAY";
-		String msg1 = "Move left and right with the ARROW KEYS.";
-		String msg2 = "Jump from platform to platform with SPACE.";
-		String msg3 = "Platforms will tilt under any weight! Be careful.";
-		String msg4 = "Avoid falling rocks.";
+		String title = "CREDITS";
+		String msg1 = "Game by Nathaniel Nelson";
+		String msg2 = "Made in 48 hours for the Fight Magic Run competition";
+		String msg3 = "Theme: Balance";
+		String msg4 = "Sounds made in sfxr, Music made in Bosca Ceoil";
 		
 		String pressSpaceMsg = "Return to menu: SPACE";
 		

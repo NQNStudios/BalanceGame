@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.natman.balance.screens.MenuScreen;
 import com.natman.balance.utils.Convert;
+import com.natman.balance.utils.SoundManager;
 
 public class BalanceGame extends Game {
 	private SpriteBatch batch;
@@ -23,6 +24,13 @@ public class BalanceGame extends Game {
 		batch = new SpriteBatch();
 		
 		setScreen(new MenuScreen(this));
+		
+		SoundManager.addSound("Boulder", Gdx.files.internal("data/boulder.wav"));
+		SoundManager.addSound("Jump", Gdx.files.internal("data/jump.wav"));
+		SoundManager.addSound("Player", Gdx.files.internal("data/Player.wav"));
+		
+		SoundManager.addSong("Music", Gdx.files.internal("data/music.wav"));
+		SoundManager.addSong("GameOver", Gdx.files.internal("data/gameover.wav"));
 	}
 
 	@Override

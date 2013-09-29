@@ -19,10 +19,20 @@ public class Player extends Entity {
 	
 	private static final float density = 12f;
 	
-	private static final float moveSpeed = 50f;
-	private static final float jumpSpeed = 1450f;
+	private static final float normalMoveSpeed = 50f;
+	private static final float normalJumpSpeed = 1450f;
+	
+	private static final float powerUpMoveSpeed = 100f;
+	private static final float powerUpJumpSpeed = 2250f;
+	
+	private static final float powerUpDuration = 15f;
 	
 	//endregion
+	
+	private float moveSpeed = normalMoveSpeed;
+	private float jumpSpeed = normalJumpSpeed;
+	
+	private float powerUpTime;
 	
 	public boolean canJump = false;
 	
@@ -30,6 +40,36 @@ public class Player extends Entity {
 		super(sheet, world);
 	}
 
+	public void processPowerups(float delta) {
+		if (moveSpeed == powerUpMoveSpeed) {
+			powerUpTime -= delta;
+			
+			if (powerUpTime <= 0f) {
+				moveSpeed = normalMoveSpeed;
+			}
+		}
+		
+		if (jumpSpeed == powerUpJumpSpeed) {
+			powerUpTime -= delta;
+			
+			if (powerUpTime <= 0f) {
+				jumpSpeed = normalJumpSpeed;
+			}
+		}
+	}
+	
+	public void givePowerup(boolean jump) {
+		powerUpTime = powerUpDuration;
+		
+		if (jump) {
+			moveSpeed = normalMoveSpeed;
+			jumpSpeed = powerUpJumpSpeed;
+		} else {
+			jumpSpeed = normalJumpSpeed;
+			moveSpeed = powerUpMoveSpeed;
+		}
+	}
+	
 	@Override
 	protected void initializeSprite(SpriteSheet sheet) {
 		sprite = sheet.makeSprite("Player");

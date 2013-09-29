@@ -1,9 +1,16 @@
 package com.natman.balance.screens;
 
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.natman.balance.BalanceGame;
 import com.natman.balance.gameplay.GameWorld;
+import com.natman.balance.utils.SoundManager;
 
 public class GameScreen implements Screen, InputProcessor {
 
@@ -11,8 +18,16 @@ public class GameScreen implements Screen, InputProcessor {
 	
 	private GameWorld world;
 	
+	private SpriteBatch batch;
+	private BitmapFont font;
+	
 	public GameScreen(BalanceGame game) {
 		this.game = game;
+		
+		batch = game.getSpriteBatch();
+		
+		font = new BitmapFont();
+		font.setColor(Color.WHITE);
 		
 		world = new GameWorld();
 	}
@@ -20,6 +35,18 @@ public class GameScreen implements Screen, InputProcessor {
 	@Override
 	public void render(float delta) {
 		world.render(delta, game.getSpriteBatch());
+		
+		TextBounds bounds = font.getBounds("Toggle Sound: M");
+		
+		OrthographicCamera camera = world.getCamera();
+		float x = camera.position.x + camera.viewportWidth / 2 - bounds.width - 5;
+		float y = camera.position.y - camera.viewportHeight / 2 + bounds.height + 5;
+		
+		batch.begin();
+		
+		font.draw(batch, "Toggle Sound: M", x, y);
+		
+		batch.end();
 		
 		if (world.gameOver) {
 			game.setScreen(new GameOverScreen(game, world.furthestX, world.furthestX == world.highScore, world.jumps, world.bonks));
@@ -59,6 +86,22 @@ public class GameScreen implements Screen, InputProcessor {
 	@Override
 	public boolean keyDown(int keycode) {
 		world.keyDown(keycode);
+		
+		if (keycode == Keys.M) {
+			//mute the SoundManager
+			if (SoundManager.getSoundVolume() == 1) {
+				SoundManager.setSoundVolume(0);
+			} else {
+				SoundManager.setSoundVolume(1);
+			}
+			
+			if (SoundManager.isMusicPlaying()) {
+				SoundManager.pauseMusic();
+			} else {
+				SoundManager.resumeMusic();
+			}
+			
+		}
 		
 		return false;
 	}
