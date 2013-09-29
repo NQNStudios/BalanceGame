@@ -47,6 +47,8 @@ public class GameWorld {
 	private boolean debugRender = true;
 	
 	private float furthestX = 0;
+	
+	private float lastX = 0;
 	private float lastWidth = maxPlatformWidth;
 	private float lastHeight = firstPillarHeight;
 	
@@ -55,19 +57,22 @@ public class GameWorld {
 	//region Config
 	
 	public static final float floorX = 0;
-	public static final float floorY = Convert.pixelsToMeters(-480);
+	public static final float floorY = Convert.pixelsToMeters(-550);
 	public static final float floorWidth = 8000;
 	public static final float floorHeight = Convert.pixelsToMeters(5);
 	
 	private static final float firstPillarHeight = 27f;
-	private static final float minPillarHeight = 15f;
-	private static final float maxPillarHeight = 30f;
-	private static final float upMax = 2.75f;
+	private static final float minPillarHeight = 23f;
+	private static final float maxPillarHeight = 34f;
+	private static final float upMax = 4f;
 	
 	private static final float minPlatformWidth = 10f;
 	private static final float maxPlatformWidth = 20f;
 	
-	private static final float removalDistance = Convert.pixelsToMeters(650);
+	private static final float maxDistance = 6f;
+	private static final float creationDistance = 20f;
+	
+	private static final float removalDistance = Convert.pixelsToMeters(500);
 	
 	//endregion
 	
@@ -109,7 +114,7 @@ public class GameWorld {
 		
 		createStartingTower();
 		
-		for (int i = 17; i < 100; i += lastWidth) {
+		for (int i = 17; i < 30; i += lastWidth) {
 			createTower(i);
 		}
 	}
@@ -148,6 +153,7 @@ public class GameWorld {
 		createPlatform(x, height, r.nextFloat(minPlatformWidth, maxPlatformWidth));
 		
 		lastHeight = height;
+		lastX = x;
 	}
 	
 	private void createPlatform(float x, float y, float width) {
@@ -172,6 +178,10 @@ public class GameWorld {
 		
 		if (player.body.getPosition().x > furthestX) {
 			furthestX = player.body.getPosition().x;
+			
+			if (furthestX >= lastX - creationDistance) {
+				createTower(lastX + r.nextFloat(lastWidth, lastWidth + maxDistance));
+			}
 		}
 		
 		batch.setProjectionMatrix(camera.combined);
@@ -226,6 +236,16 @@ public class GameWorld {
 			Body body = it.next();
 			
 			if (body == null || body.getUserData() == null) continue;
+			
+			if (body.getUserData() instanceof Pillar || body.getUserData() instanceof Platform) {
+				if (body.getPosition().x < Convert.pixelsToMeters(camera.position.x - camera.viewportWidth / 2) - maxPlatformWidth / 2) {
+					Entity e = (Entity) body.getUserData();
+					
+					delete(e);
+				}
+				
+				continue;
+			}
 			
 			if (body.getPosition().dst(cameraPos) > removalDistance) {
 				Entity e = (Entity) body.getUserData();
