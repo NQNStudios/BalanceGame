@@ -20,6 +20,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.natman.balance.gameplay.entities.Boulder;
 import com.natman.balance.gameplay.entities.Pillar;
 import com.natman.balance.gameplay.entities.Platform;
@@ -157,28 +158,52 @@ public class GameWorld {
 	private void createStartingTower() {
 		float height = firstPillarHeight;
 		
-		createPillar(0, height);
-		createPlatform(0, height, maxPlatformWidth);
+		Entity p1 = createPillar(0, height);
+		Entity p2 = createPlatform(0, height, maxPlatformWidth);
+		
+		createAnchor(height, p1, p2);
 	}
 	
 	private void createTower(float x) {
 		float height = r.nextFloat(minPillarHeight, Math.min(maxPillarHeight, lastHeight + upMax));
 		
-		createPillar(x, height);
+		Entity p1 = createPillar(x, height);
 		
-		createPlatform(x, height, r.nextFloat(minPlatformWidth, maxPlatformWidth));
+		Entity p2 = createPlatform(x, height, r.nextFloat(minPlatformWidth, maxPlatformWidth));
+		
+		createAnchor(height, p1, p2);
 		
 		lastHeight = height;
 		lastX = x;
 	}
+
+	private void createAnchor(float height, Entity p1, Entity p2) {
+		Body b1 = p1.body;
+		Body b2 = p2.body;
+		
+		RevoluteJointDef jointDef = new RevoluteJointDef();
+		jointDef.bodyA = b2;
+		jointDef.bodyB = b1;
+		
+		jointDef.localAnchorA.set(0, 0);
+		jointDef.localAnchorB.set(0, height / 2);
+		
+		jointDef.enableLimit = true;
+		jointDef.lowerAngle = (float) Math.toRadians(-60);
+		jointDef.upperAngle = (float) Math.toRadians(60);
+		
+		world.getWorld().createJoint(jointDef);
+	}
 	
-	private void createPlatform(float x, float y, float width) {
-		new Platform(spriteSheet, world.getWorld(), x, y, width);
+	private Entity createPlatform(float x, float y, float width) {
+		Entity e = new Platform(spriteSheet, world.getWorld(), x, y, width);
 		lastWidth = width;
+		return e;
 	}
 
-	private void createPillar(float x, float height) {
-		new Pillar(spriteSheet, world.getWorld(), x, height);
+	private Entity createPillar(float x, float height) {
+		Entity e = new Pillar(spriteSheet, world.getWorld(), x, height);
+		return e;
 	}
 	
 	private void createBoulder(float x) {
