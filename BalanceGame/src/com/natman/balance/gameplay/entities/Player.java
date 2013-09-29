@@ -1,11 +1,13 @@
 package com.natman.balance.gameplay.entities;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.natman.balance.gameplay.Entity;
+import com.natman.balance.utils.Convert;
 import com.natman.balance.utils.SpriteSheet;
 
 public class Player extends Entity {
@@ -16,6 +18,8 @@ public class Player extends Entity {
 	private static final float playerHeight = 2.5f;
 	
 	//endregion
+	
+	public boolean canJump = false;
 	
 	public Player(SpriteSheet sheet, World world) {
 		super(sheet, world);
@@ -30,19 +34,39 @@ public class Player extends Entity {
 	protected void initializeBody(World world, Object... args) {
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.DynamicBody;
-		bd.fixedRotation = false;
-		bd.position.set(0, 30);
+		bd.fixedRotation = true;
+		bd.position.set(0, 0);
 		
 		PolygonShape shape = new PolygonShape();
 		shape.setAsBox(playerWidth / 2, playerHeight / 2);
 		
 		FixtureDef fd = new FixtureDef();
 		fd.shape = shape;
+		fd.density = 25;
+		fd.friction = 0.3f;
+		
+		float sensorHX = Convert.pixelsToMeters(6);
+		float sensorHY = Convert.pixelsToMeters(1);
+		PolygonShape sensorShape = new PolygonShape();
+		
+		Vector2[] vertices = new Vector2[4];
+		vertices[0] = new Vector2(sensorHX, -playerHeight / 2 - sensorHY); //bottom right corner
+		vertices[1] = new Vector2(sensorHX, -playerHeight / 2 + sensorHY); //Top right corner
+		vertices[2] = new Vector2(-sensorHX, -playerHeight / 2 + sensorHY); //Top left corner
+		vertices[3] = new Vector2(-sensorHX, -playerHeight / 2 - sensorHY); //bottom left corner
+		
+		sensorShape.set(vertices);
+		
+		FixtureDef fd2 = new FixtureDef();
+		fd2.isSensor = true;
+		fd2.shape = sensorShape;
 		
 		body = world.createBody(bd);
 		body.createFixture(fd);
+		body.createFixture(fd2);
 		
 		shape.dispose();
+		sensorShape.dispose();
 	}
 
 }

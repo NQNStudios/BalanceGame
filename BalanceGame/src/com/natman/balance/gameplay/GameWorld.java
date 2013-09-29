@@ -51,7 +51,7 @@ public class GameWorld {
 	
 	public static final float floorX = 0;
 	public static final float floorY = Convert.pixelsToMeters(-480);
-	public static final float floorWidth = Convert.pixelsToMeters(800);
+	public static final float floorWidth = 8000;
 	public static final float floorHeight = Convert.pixelsToMeters(5);
 	
 	private static final float minPillarHeight = 15f;
@@ -72,6 +72,7 @@ public class GameWorld {
 		camera.setToOrtho(false, w, h);
 		
 		world = new PhysicsWorld(new Vector2(0, -10));
+		world.getWorld().setContactListener(new ContactManager());
 		worldRenderer = new Box2DDebugRenderer();
 		
 		font = new BitmapFont();
@@ -97,7 +98,11 @@ public class GameWorld {
 
 		player = new Player(spriteSheet, world.getWorld());
 		
-		createTower(2);
+		createStartingTower();
+		
+		for (int i = 17; i < 500; i += 8) {
+			createTower(i);
+		}
 	}
 
 	private void createFloor() {
@@ -115,6 +120,13 @@ public class GameWorld {
 		body.createFixture(fd);
 		
 		shape.dispose();
+	}
+	
+	private void createStartingTower() {
+		float height = 27f;
+		
+		createPillar(0, height);
+		createPlatform(0, height, maxPlatformWidth);
 	}
 	
 	private void createTower(float x) {
@@ -138,17 +150,7 @@ public class GameWorld {
 	//region Game Loop
 	
 	public void render(float delta, SpriteBatch batch) {
-		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-			camera.position.add(new Vector3(-10, 0, 0));
-		} else if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-			camera.position.add(new Vector3(10, 0, 0));
-		}
-		
-		if (Gdx.input.isKeyPressed(Keys.UP)) {
-			camera.position.add(new Vector3(0, 10, 0));
-		} else if (Gdx.input.isKeyPressed(Keys.DOWN)) {
-			camera.position.add(new Vector3(0, -10, 0));
-		}
+		camera.position.set(Convert.metersToPixels(new Vector3(player.body.getPosition().x, 0, 0)));
 		
 		camera.update();
 		
@@ -177,6 +179,18 @@ public class GameWorld {
 			worldMatrix.scale(Convert.getPixelMeterRatio(), Convert.getPixelMeterRatio(), Convert.getPixelMeterRatio());
 			
 			worldRenderer.render(world.getWorld(), worldMatrix);
+		}
+		
+		if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
+			player.body.applyForceToCenter(new Vector2(1000, 0), true);
+		}
+		
+		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
+			player.body.applyForceToCenter(new Vector2(-1000, 0), true);
+		}
+		
+		if (Gdx.input.isKeyPressed(Keys.SPACE) && player.canJump) {
+			player.body.applyForceToCenter(new Vector2(0, 32000), true);
 		}
 		
 		world.process(delta);

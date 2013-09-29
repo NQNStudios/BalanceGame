@@ -40,6 +40,8 @@ public class Platform extends Entity {
 		
 		FixtureDef fd = new FixtureDef();
 		fd.shape = shape;
+		fd.friction = 0.3f;
+		fd.density = 25;
 		
 		body = world.createBody(bd);
 		body.createFixture(fd);
