@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.natman.balance.gameplay.entities.Boulder;
 import com.natman.balance.gameplay.entities.Pillar;
 import com.natman.balance.gameplay.entities.Platform;
 import com.natman.balance.gameplay.entities.Player;
@@ -51,6 +52,9 @@ public class GameWorld {
 	private float lastX = 0;
 	private float lastWidth = maxPlatformWidth;
 	private float lastHeight = firstPillarHeight;
+	
+	private float boulderChance = 0.005f;
+	private static final float boulderSpawnRadius = Convert.pixelsToMeters(380);
 	
 	//endregion
 	
@@ -105,6 +109,7 @@ public class GameWorld {
 	private void initializeSpriteSheet() {
 		spriteSheet.addRegion("Player", new Rectangle(0, 0, 16, 40));
 		spriteSheet.addRegion("Platform", new Rectangle(16, 0, 16, 40));
+		spriteSheet.addRegion("Rock", new Rectangle(32, 0, 24, 24));
 	}
 
 	private void initializeWorld() {
@@ -165,6 +170,10 @@ public class GameWorld {
 		new Pillar(spriteSheet, world.getWorld(), x, height);
 	}
 	
+	private void createBoulder(float x) {
+		new Boulder(spriteSheet, world.getWorld(), x);
+	}
+	
 	//endregion
 	
 	//region Game Loop
@@ -182,6 +191,11 @@ public class GameWorld {
 			if (furthestX >= lastX - creationDistance) {
 				createTower(lastX + r.nextFloat(lastWidth, lastWidth + maxDistance));
 			}
+		}
+		
+		for (int i = 0; i < r.floatToInt(boulderChance); i++) {
+			float x = r.nextFloat(player.body.getPosition().x - boulderSpawnRadius, player.body.getPosition().x + boulderSpawnRadius);
+			createBoulder(x);
 		}
 		
 		batch.setProjectionMatrix(camera.combined);
